@@ -10,9 +10,10 @@ This repository is organized as a clean monorepo containing:
 - **`client/`**: React 19 single-page application built with Vite and Tailwind CSS.
 - **`server/`**: Node.js + Express REST API configured with ES modules, CORS, and centralized error handling.
 
-> **Current Milestone: Part 2 — Professional Frontend UI and Layout (Completed).**  
-> Part 1 established the development environment and Express health-check foundation.  
-> Part 2 introduces a professional SaaS interface inspired by Slack and Microsoft Teams, featuring workspace switching, channel navigation, direct messaging, message composition with keyboard shortcuts, responsive off-canvas mobile drawer, and session message state.
+> **Current Milestone: Part 3 — MongoDB Database Setup and Data Models (Completed).**  
+> - **Part 1**: Project setup, React + Vite frontend, Express backend, and health-check API.  
+> - **Part 2**: Professional Slack/Teams-inspired UI layout, modular components, and responsive mobile drawer.  
+> - **Part 3**: MongoDB database layer with Mongoose 9, robust connection management, 7 data models (User, Workspace, WorkspaceMembership, Channel, ChannelMembership, Conversation, Message), compound unique indexes, data integrity constraints, enriched `/api/health` diagnostics, and automated DB verification.
 
 ---
 
@@ -21,7 +22,7 @@ This repository is organized as a clean monorepo containing:
 | Layer | Technologies |
 | :--- | :--- |
 | **Frontend** | React 19, Vite 8, Tailwind CSS v4, Lucide React Icons |
-| **Backend** | Node.js (v22+), Express 4, CORS, Dotenv, Nodemon |
+| **Backend** | Node.js (v22+), Express 4, MongoDB, Mongoose 9, CORS, Dotenv, Nodemon |
 | **Tooling** | Concurrently, NPM Scripts, Oxlint |
 
 ---
@@ -46,7 +47,7 @@ SyncSpace/
 │   │   │   │   ├── ChatHeader.jsx      # Active channel header & responsive actions
 │   │   │   │   └── WorkspaceSidebar.jsx# Workspace rail, switcher, & health diagnostic
 │   │   │   └── modals/
-│   │   │       ├── HealthStatusModal.jsx# Diagnostic modal (Part 1 API verification)
+│   │   │       ├── HealthStatusModal.jsx# Diagnostic modal (Part 1 & 3 API verification)
 │   │   │       ├── InfoModal.jsx       # Informative notices for future roadmap actions
 │   │   │       └── NewChannelModal.jsx # Create local channels dialog
 │   │   ├── data/
@@ -63,14 +64,27 @@ SyncSpace/
 │
 ├── server/                     # Backend Node.js + Express application
 │   ├── src/
+│   │   ├── config/
+│   │   │   └── database.js           # Mongoose connection with retry & graceful shutdown
 │   │   ├── controllers/
-│   │   │   └── health.controller.js  # Handler for /api/health
+│   │   │   └── health.controller.js  # /api/health with DB readyState checking
 │   │   ├── middleware/
 │   │   │   └── errorHandler.js       # Centralized 404 & error handlers
+│   │   ├── models/
+│   │   │   ├── User.js               # Normalized email, hidden passwordHash, status
+│   │   │   ├── Workspace.js          # Workspace with ownerId and slug
+│   │   │   ├── WorkspaceMembership.js# Compound unique index (workspaceId + userId)
+│   │   │   ├── Channel.js            # Workspace-scoped unique channel names & type
+│   │   │   ├── ChannelMembership.js  # Compound unique index (channelId + userId)
+│   │   │   ├── Conversation.js       # 1-to-1 DMs with deterministic participant sorting
+│   │   │   ├── Message.js            # Mutual exclusivity validator & chronological index
+│   │   │   └── index.js              # Central model exporter
 │   │   ├── routes/
 │   │   │   └── health.routes.js      # Health check router definition
+│   │   ├── scripts/
+│   │   │   └── verifyDb.js           # Safe dev verification script for Mongoose models
 │   │   ├── app.js                    # Express app configuration & middleware
-│   │   └── server.js                 # HTTP server listener & graceful shutdown
+│   │   └── server.js                 # HTTP listener & database connection startup
 │   ├── .env.example            # Example backend environment variables
 │   ├── .env                    # Local backend environment variables (git-ignored)
 │   └── package.json            # Backend dependencies & scripts
@@ -87,6 +101,7 @@ SyncSpace/
 ### 1. Prerequisites
 - **Node.js**: `v18.0.0` or higher (verified on `v22.22.3`)
 - **NPM**: `v9.0.0` or higher (verified on `v10.9.8`)
+- **MongoDB**: Local MongoDB Server or MongoDB Atlas cluster
 
 Check your installed versions:
 ```powershell
@@ -106,6 +121,9 @@ Create or edit `server/.env`:
 PORT=5000
 NODE_ENV=development
 CLIENT_URL=http://localhost:5173
+
+# Local MongoDB URI or MongoDB Atlas URI:
+MONGODB_URI=mongodb://localhost:27017/syncspace
 ```
 
 #### Frontend (`client/.env`)
@@ -118,7 +136,17 @@ VITE_API_BASE_URL=http://localhost:5000
 
 ---
 
-### 3. Install Dependencies
+### 3. Database Verification Command
+
+Verify that your MongoDB instance is running and that all 7 Mongoose schemas, unique compound indexes, and mutual exclusivity constraints pass validation:
+
+```powershell
+npm run db:verify
+```
+
+---
+
+### 4. Running the Application
 
 You can install all dependencies from the root directory with one command:
 ```powershell
@@ -221,9 +249,10 @@ Open two separate terminal windows:
 
 ---
 
-## 🗺️ What's Coming in Part 3
-- MongoDB database connection using Mongoose
-- User schema, model, and registration/login endpoints
-- JWT authentication and protected route middleware
-- Channel & workspace persistence in database
+## 🗺️ What's Coming in Part 4
+- User registration and login endpoints (Password hashing with Argon2 / Bcrypt)
+- JWT token generation, refresh tokens, and authentication middleware
+- Workspace & Channel CRUD operations with access authorization
+- Direct conversation creation and message persistence APIs
+
 
