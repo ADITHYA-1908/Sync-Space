@@ -10,18 +10,19 @@ This repository is organized as a clean monorepo containing:
 - **`client/`**: React 19 single-page application built with Vite and Tailwind CSS.
 - **`server/`**: Node.js + Express REST API configured with ES modules, CORS, and centralized error handling.
 
-> **Current Milestone: Part 1 — Project Setup and Foundation.**  
-> Part 1 establishes the development environment, environment configuration, health monitoring, and modular architecture. Database models, authentication, and Socket.IO real-time features will be added in upcoming parts.
+> **Current Milestone: Part 2 — Professional Frontend UI and Layout (Completed).**  
+> Part 1 established the development environment and Express health-check foundation.  
+> Part 2 introduces a professional SaaS interface inspired by Slack and Microsoft Teams, featuring workspace switching, channel navigation, direct messaging, message composition with keyboard shortcuts, responsive off-canvas mobile drawer, and session message state.
 
 ---
 
-## 🛠️ Technology Stack (Part 1)
+## 🛠️ Technology Stack
 
 | Layer | Technologies |
 | :--- | :--- |
-| **Frontend** | React 19, Vite, Tailwind CSS v4 |
+| **Frontend** | React 19, Vite 8, Tailwind CSS v4, Lucide React Icons |
 | **Backend** | Node.js (v22+), Express 4, CORS, Dotenv, Nodemon |
-| **Tooling** | Concurrently, NPM Scripts |
+| **Tooling** | Concurrently, NPM Scripts, Oxlint |
 
 ---
 
@@ -32,14 +33,31 @@ SyncSpace/
 ├── client/                     # Frontend React + Vite application
 │   ├── public/                 # Static assets (favicons, icons)
 │   ├── src/
-│   │   ├── App.jsx             # Main application UI & Health status monitor
-│   │   ├── App.css             # Component styles
-│   │   ├── index.css           # Tailwind CSS imports & base styles
-│   │   └── main.jsx            # React root mount entry point
+│   │   ├── components/
+│   │   │   ├── chat/
+│   │   │   │   ├── MessageInput.jsx    # Auto-resizing message composer & formatting bar
+│   │   │   │   ├── MessageItem.jsx     # Individual message with reactions & action bar
+│   │   │   │   └── MessageList.jsx     # Auto-scrolling feed & welcome banner
+│   │   │   ├── common/
+│   │   │   │   ├── Badge.jsx           # Notification count badge
+│   │   │   │   └── UserAvatar.jsx      # Initials avatar with active status dot
+│   │   │   ├── layout/
+│   │   │   │   ├── ChannelSidebar.jsx  # Channels, DMs, filter search, & user card
+│   │   │   │   ├── ChatHeader.jsx      # Active channel header & responsive actions
+│   │   │   │   └── WorkspaceSidebar.jsx# Workspace rail, switcher, & health diagnostic
+│   │   │   └── modals/
+│   │   │       ├── HealthStatusModal.jsx# Diagnostic modal (Part 1 API verification)
+│   │   │       ├── InfoModal.jsx       # Informative notices for future roadmap actions
+│   │   │       └── NewChannelModal.jsx # Create local channels dialog
+│   │   ├── data/
+│   │   │   └── mockData.js             # Seed data for workspaces, channels, DMs, & messages
+│   │   ├── App.jsx                     # Top-level workspace layout & state management
+│   │   ├── index.css                   # Tailwind CSS v4 imports & custom dark scrollbars
+│   │   └── main.jsx                    # React 19 application mount
 │   ├── .env.example            # Example frontend environment variables
 │   ├── .env                    # Local frontend environment variables (git-ignored)
 │   ├── .gitignore              # Client-specific Git ignores
-│   ├── index.html              # HTML template
+│   ├── index.html              # HTML template with SyncSpace branding
 │   ├── package.json            # Frontend dependencies & scripts
 │   └── vite.config.js          # Vite config with React & Tailwind plugins
 │
@@ -203,7 +221,9 @@ Open two separate terminal windows:
 
 ---
 
-## 🗺️ What's Coming in Part 2
+## 🗺️ What's Coming in Part 3
 - MongoDB database connection using Mongoose
 - User schema, model, and registration/login endpoints
 - JWT authentication and protected route middleware
+- Channel & workspace persistence in database
+
